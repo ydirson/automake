@@ -477,6 +477,8 @@ my @dist_targets;
 my %known_programs;
 my %known_libraries;
 
+my %native_programs;
+
 # This keeps track of which extensions we've seen (that we care
 # about).
 my %extension_seen;
@@ -588,6 +590,8 @@ sub initialize_per_input ()
 
     %known_programs = ();
     %known_libraries= ();
+
+    %native_programs = ();
 
     %extension_seen = ();
 
@@ -2439,6 +2443,8 @@ sub handle_programs ()
   return if ! @proglist;
   $must_handle_compiled_objects = 1;
 
+  my $exeext;
+
   my $seen_global_libobjs =
     var ('LDADD') && handle_lib_objects ('', 'LDADD');
 
@@ -2496,6 +2502,15 @@ sub handle_programs ()
 
       $libtool_clean_directories{dirname ($one_file)} = 1;
 
+      if (exists $native_programs{$one_file})
+        {
+          $exeext = '$(BUILD_EXEEXT)';
+        }
+      else
+        {
+          $exeext = '$(EXEEXT)';
+        }
+
       $output_rules .= file_contents ('program',
                                       $where,
                                       PROGRAM  => $one_file,
@@ -2503,7 +2518,7 @@ sub handle_programs ()
                                       XLINK    => $xlink,
                                       VERBOSE  => $vlink,
                                       DIRSTAMP => $dirstamp,
-                                      EXEEXT   => '$(EXEEXT)');
+                                      EXEEXT   => $exeext);
 
       if ($seen_libobjs || $seen_global_libobjs)
 	{
@@ -7165,6 +7180,10 @@ sub am_install_var
 	        if $primary eq 'PROGRAMS';
 
 	      push (@result, $locvals);
+              if ($primary eq 'PROGRAMS' && $nodir_name eq 'native')
+                {
+                  $native_programs{${$locvals}[1]} = 1;
+                }
 	    }
 	}
       # A blatant hack: we rewrite each _PROGRAMS primary to include
