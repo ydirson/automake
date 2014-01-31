@@ -1523,6 +1523,21 @@ sub append_exeext (&$)
        return $val;
      });
 }
+sub append_buildexeext (&$)
+{
+  my ($pred, $macro) = @_;
+
+  transform_variable_recursively
+    ($macro, $macro, 'am__BUILD_EXEEXT', 0, INTERNAL,
+     sub {
+       my ($subvar, $val, $cond, $full_cond) = @_;
+       # Append $(BUILD_EXEEXT) unless the user did it already, or it's a
+       # @substitution@.
+       $val .= '$(BUILD_EXEEXT)'
+	 if $val !~ /(?:\$\(BUILD_EXEEXT\)$|^[@]\w+[@]$)/ && &$pred ($val);
+       return $val;
+     });
+}
 
 
 # Check to make sure a source defined in LIBOBJS is not explicitly
@@ -7154,8 +7169,17 @@ sub am_install_var
 	}
       # A blatant hack: we rewrite each _PROGRAMS primary to include
       # EXEEXT.
-      append_exeext { 1 } $one_name
-	if $primary eq 'PROGRAMS';
+      if ($primary eq 'PROGRAMS')
+        {
+          if ($nodir_name eq 'native')
+            {
+              append_buildexeext { 1 } $one_name;
+            }
+          else
+            {
+              append_exeext { 1 } $one_name;
+            }
+        }
       # "EXTRA" shouldn't be used when generating clean targets,
       # all, or install targets.  We used to warn if EXTRA_FOO was
       # defined uselessly, but this was annoying.
