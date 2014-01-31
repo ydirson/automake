@@ -1387,6 +1387,12 @@ sub handle_languages ()
 		$obj_compile =~ s/\(AM_$flag\)/\($val\)/
 		  if set_seen ($val);
 	      }
+	    for my $flag ($lang->ccer, $lang->lder)
+	      {
+		my $val = "${derived}_$flag";
+                $obj_compile =~ s/\($flag\)/\($val\)/
+                  if set_seen ($val);
+	      }
 
 	    my $libtool_tag = '';
 	    if ($lang->libtool_tag && exists $libtool_tags{$lang->libtool_tag})
@@ -1634,6 +1640,8 @@ sub handle_single_transform
 	    my $have_per_exec_flags = 0;
 	    my @peflags = @{$lang->flags};
 	    push @peflags, 'LIBTOOLFLAGS' if $obj eq '.lo';
+	    push @peflags, $lang->ccer if defined $lang->ccer;
+	    push @peflags, $lang->lder if defined $lang->lder;
 	    foreach my $flag (@peflags)
 	      {
 		if (set_seen ("${derived}_$flag"))
