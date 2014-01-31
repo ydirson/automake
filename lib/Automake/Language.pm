@@ -61,6 +61,7 @@ Class::Struct::struct (
 	'linker' => "\$",
 	# Content of the linking variable.
 	'link' => "\$",
+	'build_link' => "\$",
 
 	# Name of the compiler variable (CC).
 	'ccer' => "\$",

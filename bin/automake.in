@@ -635,6 +635,7 @@ register_language ('name' => 'c',
 		   'ld' => '$(CC)',
 		   'linker' => 'LINK',
 		   'link' => '$(CCLD) $(AM_CFLAGS) $(CFLAGS) $(AM_LDFLAGS) $(LDFLAGS) -o $@',
+		   'build_link' => '$(BUILD_CCLD) $(AM_BUILD_CFLAGS) $(BUILD_CFLAGS) $(AM_BUILD_LDFLAGS) $(BUILD_LDFLAGS) -o $@',
 		   'compile_flag' => '-c',
 		   'output_flag' => '-o',
 		   'libtool_tag' => 'CC',
@@ -2505,6 +2506,7 @@ sub handle_programs ()
       if (exists $native_programs{$one_file})
         {
           $exeext = '$(BUILD_EXEEXT)';
+          $xlink = "BUILD_$xlink";
         }
       else
         {
@@ -6165,6 +6167,7 @@ sub define_linker_variable
 		. "\$(LIBTOOLFLAGS) --mode=link ";
       }
     define_variable ($lang->linker, $link . $lang->link, INTERNAL);
+    define_variable ("BUILD_" . $lang->linker, $link . $lang->build_link, INTERNAL);
     define_variable ($lang->compiler, $lang, INTERNAL);
     define_verbose_tagvar ($lang->lder || 'GEN');
 }
