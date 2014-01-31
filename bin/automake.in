@@ -2420,7 +2420,7 @@ sub handle_programs ()
 {
   my @proglist = am_install_var ('progs', 'PROGRAMS',
 				 'bin', 'sbin', 'libexec', 'pkglibexec',
-				 'noinst', 'check');
+				 'noinst', 'native', 'check');
   return if ! @proglist;
   $must_handle_compiled_objects = 1;
 
@@ -7172,7 +7172,7 @@ sub am_install_var
 	}
 
       # Is this to be installed?
-      my $install_p = $nodir_name ne 'noinst' && $nodir_name ne 'check';
+      my $install_p = $nodir_name ne 'noinst' && $nodir_name ne 'native' && $nodir_name ne 'check';
 
       # If so, with install-exec? (or install-data?).
       my $exec_p = ($nodir_name =~ /$EXEC_DIR_PATTERN/o);
